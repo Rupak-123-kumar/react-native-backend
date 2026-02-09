@@ -8,27 +8,28 @@ const attendanceSchema = new mongoose.Schema(
       required: true,
     },
 
+    // 🔑 IMPORTANT: normalized date
     date: {
-      type: Date,
+      type: String, // YYYY-MM-DD
       required: true,
     },
 
     status: {
       type: String,
       enum: ['Present', 'Absent', 'Late'],
-      required: true,
+      default: 'Present',
     },
 
     checkInTime: {
-      type: String,
+      type: Date,
     },
 
     checkOutTime: {
-      type: String,
+      type: Date,
     },
 
     workingMinutes: {
-      type: Number, // e.g. 440 (7h 20m)
+      type: Number,
       default: 0,
     },
   },
