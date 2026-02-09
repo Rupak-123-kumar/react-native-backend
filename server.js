@@ -12,18 +12,21 @@ connectDB();
 const app = express();
 
 // ================= MIDDLEWARE =================
-app.use(cors());           // ✅ OK
-app.use(express.json());   // ✅ MUST (present)
+app.use(cors());
+app.use(express.json());
 
 // ================= ROUTES =================
-app.use('/api/auth', require('./routes/authRoutes'));        // ✅ OK
-app.use('/api/attendance', require('./routes/attendanceRoutes')); // ✅ OK
-app.use('/api/profile', require('./routes/profileRoutes'));  // ✅ OK
-app.use('/api/reports', require('./routes/reportRoutes'));   // ✅ OK
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/attendance', require('./routes/attendanceRoutes'));
+app.use('/api/profile', require('./routes/profileRoutes'));
+app.use('/api/reports', require('./routes/reportRoutes'));
+
+// 🔥 ADD THIS (DASHBOARD ROUTE)
+app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 
 // ================= ROOT ROUTE =================
 app.get('/', (req, res) => {
-  res.status(200).send('Attendance API is running 🚀'); // ✅ OK
+  res.status(200).send('Attendance API is running 🚀');
 });
 
 // ================= PORT =================
