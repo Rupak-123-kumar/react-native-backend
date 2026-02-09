@@ -3,21 +3,21 @@ const {
   checkIn,
   checkOut,
   getHistory,
-  getTodayAttendance,   // ✅ ADD THIS
+  getTodayAttendance,
 } = require('../controllers/attendanceController');
 
 const router = express.Router();
 
 // ✅ CHECK IN
-router.post('/checkin', checkIn);
+router.post('/check-in', checkIn);
 
 // ✅ CHECK OUT
-router.post('/checkout', checkOut);
+router.post('/check-out', checkOut);
 
 // ✅ ATTENDANCE HISTORY
 router.get('/history/:userId', getHistory);
 
-// ✅ TODAY ATTENDANCE (🔥 MISSING ROUTE)
+// ✅ TODAY ATTENDANCE
 router.get('/today/:userId', getTodayAttendance);
 
 module.exports = router;
