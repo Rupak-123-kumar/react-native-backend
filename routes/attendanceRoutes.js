@@ -1,4 +1,6 @@
 const express = require('express');
+const router = express.Router();
+
 const {
   checkIn,
   checkOut,
@@ -6,18 +8,12 @@ const {
   getTodayAttendance,
 } = require('../controllers/attendanceController');
 
-const router = express.Router();
+// ✅ MUST MATCH FRONTEND
+router.post('/checkin', checkIn);
+router.post('/checkout', checkOut);
 
-// ✅ CHECK IN
-router.post('/check-in', checkIn);
-
-// ✅ CHECK OUT
-router.post('/check-out', checkOut);
-
-// ✅ ATTENDANCE HISTORY
-router.get('/history/:userId', getHistory);
-
-// ✅ TODAY ATTENDANCE
+// ✅ FETCH DATA
 router.get('/today/:userId', getTodayAttendance);
+router.get('/history/:userId', getHistory);
 
 module.exports = router;
