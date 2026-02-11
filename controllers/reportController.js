@@ -1,70 +1,80 @@
 const Attendance = require('../models/Attendance');
 
 /**
- * MONTHLY REPORT
- * Returns present, absent, late count & percentage for a month
+ * ===============================
+ * 📅 MONTHLY REPORT
+ * ===============================
+ * Used by Reports screen
  */
 exports.getMonthlyReport = async (req, res) => {
   try {
     const { userId } = req.params;
     const { month, year } = req.query;
 
-    // Example date format stored: YYYY-MM-DD
+    if (!month || !year) {
+      return res.status(400).json({
+        message: 'Month and year are required',
+      });
+    }
+
+    // YYYY-MM format
+    const monthKey = `${year}-${String(month).padStart(2, '0')}`;
+
     const records = await Attendance.find({
-      userId,
-      date: { $regex: `^${year}-${month}` },
-    });
+      user: userId,
+      date: { $regex: `^${monthKey}` },
+    }).sort({ date: 1 });
 
-    const totalDays = records.length;
-    const present = records.filter(r => r.status === 'Present').length;
-    const absent = records.filter(r => r.status === 'Absent').length;
-    const late = records.filter(r => r.status === 'Late').length;
-
-    const attendancePercentage =
-      totalDays === 0 ? 0 : Math.round((present / totalDays) * 100);
+    const attendanceList = records.map(r => ({
+      date: r.date,
+      status: r.status,      // ✅ stored status
+      late: r.isLate,        // ✅ correct late flag
+    }));
 
     res.json({
-      userId,
-      month,
-      year,
-      totalDays,
-      present,
-      absent,
-      late,
-      attendancePercentage,
+      month: new Date(year, month - 1).toLocaleString('en-IN', {
+        month: 'long',
+        year: 'numeric',
+      }),
+      attendanceList,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error generating monthly report', error });
+    console.error('Monthly report error:', error);
+    res.status(500).json({
+      message: 'Error generating monthly report',
+    });
   }
 };
 
 /**
- * SUMMARY REPORT
- * Returns lifetime attendance summary
+ * ===============================
+ * 📊 LIFETIME SUMMARY
+ * ===============================
+ * Optional (dashboard / admin)
  */
 exports.getSummaryReport = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const records = await Attendance.find({ userId });
+    const records = await Attendance.find({ user: userId });
 
-    const totalDays = records.length;
-    const present = records.filter(r => r.status === 'Present').length;
-    const absent = records.filter(r => r.status === 'Absent').length;
-    const late = records.filter(r => r.status === 'Late').length;
-
-    const attendancePercentage =
-      totalDays === 0 ? 0 : Math.round((present / totalDays) * 100);
+    const attendanceList = records.map(r => ({
+      date: r.date,
+      status: r.status,
+      late: r.isLate,
+    }));
 
     res.json({
-      userId,
-      totalDays,
-      present,
-      absent,
-      late,
-      attendancePercentage,
+      totalDays: attendanceList.length,
+      present: attendanceList.filter(r => r.status === 'Present').length,
+      absent: attendanceList.filter(r => r.status === 'Absent').length,
+      late: attendanceList.filter(r => r.late).length,
+      attendanceList,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error generating summary report', error });
+    console.error('Summary report error:', error);
+    res.status(500).json({
+      message: 'Error generating summary report',
+    });
   }
 };
